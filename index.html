@@ -6,6 +6,218 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Image Editor</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+    :root {
+      --gap-xs: 0.25rem;
+      --gap-sm: 0.5rem;
+      --gap-md: 1rem;
+      --gap-lg: 1.25rem;
+      --gap-xl: 1.5rem;
+    }
+
+    html {
+      --primary-cl: #FFF;
+      --title-cl: #000;
+      --accent-cl: #5372F0;
+      --info-cl: #464646;
+
+      --body-bg: #E3F2FD;
+      --editor-bg: var(--primary-cl);
+    }
+
+    /*
+      Global Styles
+    */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      height 100vh;
+      display: grid;
+      min-height: 750px;
+      place-items: center;
+      padding: 0 var(--gap-md);
+      background-color: var(--body-bg);
+    }
+    :disabled {
+      opacity: 0.6;
+    }
+
+    /*
+      Utilites
+    */
+
+    .visually-hidden {
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+    }
+
+    .title {
+      color: var(--title-cl);
+    }
+    .title.main {
+      font-size: 1.375rem;
+      margin-bottom: var(--gap-xs);
+      font-weight: 500;
+    }
+    .title.sub {
+      font-size: 1.1rem;
+      margin-bottom: var(--gap-md);
+      font-weight: 600;
+    }
+
+    .btn {
+      color: #6C757D;
+      font-size: 14px;
+      min-height: 40px;
+      background: none;
+      border-radius: 3px;
+      border: 1px solid #aaa;
+      padding: 0 var(--gap-sm);
+      text-transform: uppercase;
+      transition: background-color 0.3s;
+      will-change: border-color, background-color;
+    }
+    .btn:is(:hover, :focus-visible) {
+      background-color: #f5f5f5;
+    }
+    .icon-btn {
+      align-items: center;
+      display: inline-flex;
+    }
+
+    /*
+      Editor Styles
+    */
+
+    .editor {
+      display: grid;
+      gap: var(--gap-md);
+      border-radius: 10px;
+      background-color: var(--editor-bg);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      padding: var(--gap-lg) var(--gap-xl) var(--gap-xl);
+    }
+    @media (min-width: 768px) {
+      .editor {
+        gap: var(--gap-xl);
+        padding: 30px 35px 35px;
+        grid-template: "title title"
+          "options preview"
+          "controls controls";
+      }
+      .editor>.title.main {
+        grid-area: title;
+      }
+    }
+
+    /* [1] Options */
+    .options {
+      display: grid;
+      gap: var(--gap-xl);
+      border-radius: 3px;
+      grid-area: options;
+      border: 1px solid #ccc;
+      padding: var(--gap-md) var(--gap-lg);
+    }
+
+    /* Filters */
+
+    .filters .tabs {
+      display: grid;
+      gap: var(--gap-sm);
+      align-items: center;
+      margin-bottom: var(--gap-lg);
+      grid-template-rows: repeat(2, 40px);
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .filters .tabs [aria-selected="true"]:not(:disabled) {
+      color: var(--primary-cl);
+      border-color: transparent;
+      background-color: var(--accent-cl);
+    }
+
+    .filters .slider .label,
+    .filters .slider input {
+      width: 100%;
+    }
+    .filters .slider .label {
+      display: flex;
+      font-size: 14px;
+      align-items: center;
+      color: var(--info-cl);
+      text-transform: capitalize;
+      justify-content: space-between;
+    }
+    .filters .slider input {
+      height: 5px;
+      accent-color: var(--primary-cl);
+    }
+
+    /* Rotate */
+
+    .rotate {
+      margin-top: var(--gap-xl);
+    }
+    .rotate .btn+.btn {
+      margin-left: var(--gap-sm);
+    }
+
+    /* [2] Preview */
+    @media (min-width: 768px) {
+      .preview {
+        grid-area: preview;
+      }
+    }
+    .preview * {
+      max-width: 100%;
+    }
+    @media (max-width: 767px) {
+      .preview * {
+        max-height: 200px;
+      }
+    }
+
+    /* [3] Controls */
+    .controls {
+      display: flex;
+      gap: var(--gap-xs);
+    }
+    @media (min-width: 768px) {
+      .controls {
+        gap: var(--gap-sm);
+        grid-area: controls;
+      }
+      #reset {
+        margin-right: auto;
+      }
+    }
+    .controls .choose,
+    .controls .save {
+      color: var(--primary-cl);
+      border-color: transparent;
+    }
+    .controls .choose:hover,
+    .controls .save:hover {
+      opacity: 0.8;
+    }
+    .controls .choose {
+      background-color: #6C757D;
+    }
+    .controls .save {
+      background-color: var(--accent-cl);
+    }
+  </style>
 </head>
 
 <body>
