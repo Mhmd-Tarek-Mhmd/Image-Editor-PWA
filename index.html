@@ -8,6 +8,7 @@
   <title>Image Editor</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
     :root {
       --gap-xs: 0.25rem;
       --gap-sm: 0.5rem;
@@ -197,7 +198,6 @@
         gap: var(--gap-sm);
         grid-area: controls;
       }
-
       #reset {
         margin-right: auto;
       }
@@ -333,6 +333,246 @@
       </div>
     </article>
   </main>
+
+  <script>
+    (function() {
+      const $ = document.querySelector.bind(document);
+      const $$ = document.querySelectorAll.bind(document);
+
+      const FiltersModal = {
+        brightness: { val: 100, max: 200 },
+        saturation: { val: 100, max: 200 },
+        inversion: { val: 0, max: 100 },
+        grayscale: { val: 0, max: 100 },
+      };
+      const TransformsModal = {
+        rotate: 0,
+        flipVert: 1,
+        flipHorz: 1,
+      };
+
+      const Controller = {
+        // Filters
+
+        getFilter: (name) => FiltersModal[name],
+        resetFilters: () => {
+          FiltersModal.brightness.val = 100;
+          FiltersModal.saturation.val = 100;
+          FiltersModal.inversion.val = 0;
+          FiltersModal.grayscale.val = 0;
+        },
+
+        setFilterVal: (name, val) => FiltersModal[name].val = val,
+        getFiltersVals: () => Object.values(FiltersModal).map(f => f.val),
+
+        // Transforms
+
+        getRotate: () => TransformsModal.rotate,
+        setRotate: (val) => TransformsModal.rotate = val,
+
+        getFlipVert: () => TransformsModal.flipVert,
+        setFlipVert: (val) => TransformsModal.flipVert = val,
+
+        getFlipHorz: () => TransformsModal.flipHorz,
+        setFlipHorz: (val) => TransformsModal.flipHorz = val,
+
+        resetTransforms: () => {
+          TransformsModal.rotate = 0;
+          TransformsModal.flipHorz = 1;
+          TransformsModal.flipVert = 1;
+        },
+
+        // Init
+
+        init: function() {
+          FiltersViews.init();
+          TransformsViews.init();
+          ControlsViews.init();
+        },
+      };
+
+      const FiltersViews = {
+        init: function() {
+          const { chooseFilter, updateFilter } = this.render;
+          const choose = chooseFilter.bind(FiltersViews.render);
+          const update = updateFilter.bind(FiltersViews.render);
+
+          $("#slider").onchange = update;
+          $$(".filters .btn").forEach(btn => btn.onclick = choose);
+        },
+
+        render: {
+          chooseFilter: function(e) {
+            const name = e.target.textContent;
+            const { val, max } = Controller.getFilter(name);
+
+            // [1] Handle Slider Label
+            this.updateSliderLabel.all(name, val);
+
+            // [2] Handle Slider
+            this.updateSlider.all(max, val, name);
+
+            // [3] Handle Active Tab
+            e.target.parentElement.querySelector("[aria-selected=true]").ariaSelected = String(false);
+            e.target.ariaSelected = String(true);
+          },
+          updateFilter: function({ target: { ariaLabel: name, value: val } }) {
+            Controller.setFilterVal(name, val);
+            this.updateSliderLabel.val(val);
+            this.applyFilters();
+          },
+          applyFilters: () => {
+            const [brightness, saturation, inversion, grayscale] = Controller.getFiltersVals();
+            $("#preview").style.filter = `brightness(${brightness}%) saturate(${saturation}%) invert(${inversion}%) grayscale(${grayscale}%)`;
+          },
+          resetFilters: function() {
+            Controller.resetFilters();
+            this.applyFilters();
+
+            const name = $(".tabs [aria-selected=true]").textContent;
+            const { val } = Controller.getFilter(name);
+
+            this.updateSlider.val(val);
+            this.updateSliderLabel.val(val);
+          },
+          updateSlider: {
+            max: (max) => $("#slider").max = max,
+            val: (val) => $("#slider").value = val,
+            aria: (aria) => $("#slider").ariaLabel = aria,
+            all: function(max, val, aria) {
+              this.max(max);
+              this.val(val);
+              this.aria(aria);
+            },
+          },
+          updateSliderLabel: {
+            name: (name) => $(".slider .name").innerHTML = name,
+            val: (val) => $(".slider .val").innerHTML = val + "%",
+            all: function(name, val) {
+              this.name(name);
+              this.val(val);
+            },
+          },
+        },
+      };
+      const TransformsViews = {
+        init: function() {
+          const { rotateRight, rotateLeft, flipVert, flipHorz, applyTransforms } = this.render;
+
+          $$(".transforms .icon-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+              switch (btn.id) {
+                case "rotate-right":
+                  rotateRight();
+                  break;
+                case "rotate-left":
+                  rotateLeft();
+                  break;
+                case "flip-vert":
+                  flipVert();
+                  break;
+                case "flip-horz":
+                  flipHorz();
+              }
+              applyTransforms();
+            });
+          });
+        },
+
+        render: {
+          rotateRight: () => {
+            Controller.setRotate(
+              Controller.getRotate() + 90
+            );
+          },
+          rotateLeft: () => {
+            Controller.setRotate(
+              Controller.getRotate() - 90
+            );
+          },
+          flipVert: () => {
+            Controller.setFlipVert(
+              Controller.getFlipVert() === -1 ? 1 : -1
+            );
+          },
+          flipHorz: () => {
+            Controller.setFlipHorz(
+              Controller.getFlipHorz() === -1 ? 1 : -1
+            );
+          },
+          applyTransforms: () => {
+            const { getRotate, getFlipVert, getFlipHorz } = Controller;
+            $("#preview").style.transform = `rotate(${getRotate()}deg) scale(${getFlipHorz()}, ${getFlipVert()})`;
+          },
+          resetTransforms: function() {
+            Controller.resetTransforms();
+            this.applyTransforms();
+          },
+        },
+      };
+      const ControlsViews = {
+        init: function() {
+          const { reset, upload, save } = this.render;
+
+          $("#reset").onclick = reset;
+          $("#upload").onchange = upload;
+          $("#choose").onclick = () => $("#upload").click();
+          $("#save").onclick = save;
+        },
+
+        render: {
+          reset: () => {
+            FiltersViews.render.resetFilters();
+            TransformsViews.render.resetTransforms();
+          },
+          upload: () => {
+            const file = $("#upload").files[0];
+            if (!file) return;
+
+            $(".preview").innerHTML = `
+          <img
+            src=${URL.createObjectURL(file)}
+            alt="Editor Preview"
+            id="preview"
+          />
+        `;
+
+            $("#reset").click();
+            $$("[disabled]").length &&
+              $$("[disabled]").forEach(ele => ele.removeAttribute("disabled"));
+          },
+          save: () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const previewImg = $("#preview");
+
+            // [1] Set Canvas Dimensions
+            canvas.width = previewImg.naturalWidth;
+            canvas.height = previewImg.naturalHeight;
+
+            // [2] Set Context Styles
+            ctx.filter = previewImg.style.filter;
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+
+            const { getRotate, getFlipHorz, getFlipVert } = Controller;
+            getRotate() && ctx.rotate(getRotate() * Math.PI / 180);
+            ctx.scale(getFlipHorz(), getFlipVert());
+
+            // [3] Draw Context
+            ctx.drawImage(previewImg, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+
+            // [4] Handle Download
+            const link = document.createElement("a");
+            link.download = "image.jpg";
+            link.href = canvas.toDataURL();
+            link.click();
+          },
+        },
+      };
+
+      Controller.init();
+    })();
+  </script>
 </body>
 
 </html>
