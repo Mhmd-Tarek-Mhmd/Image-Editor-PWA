@@ -1,535 +1,757 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Image Editor</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Image Editor</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+      :root {
+        --gap-xs: 0.25rem;
+        --gap-sm: 0.5rem;
+        --gap-md: 1rem;
+        --gap-lg: 1.25rem;
+        --gap-xl: 1.5rem;
+      }
 
-    :root {
-      --gap-xs: 0.25rem;
-      --gap-sm: 0.5rem;
-      --gap-md: 1rem;
-      --gap-lg: 1.25rem;
-      --gap-xl: 1.5rem;
-    }
+      html {
+        --primary-cl: #fff;
+        --title-cl: #000;
+        --accent-cl: #5372f0;
+        --info-cl: #464646;
 
-    html {
-      --primary-cl: #FFF;
-      --title-cl: #000;
-      --accent-cl: #5372F0;
-      --info-cl: #464646;
+        --body-bg: #e3f2fd;
+        --editor-bg: var(--primary-cl);
+      }
 
-      --body-bg: #E3F2FD;
-      --editor-bg: var(--primary-cl);
-    }
-
-    /*
+      /*
       Global Styles
     */
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-    body {
-      height 100vh;
-      display: grid;
-      min-height: 750px;
-      place-items: center;
-      padding: 0 var(--gap-md);
-      background-color: var(--body-bg);
-    }
-    :disabled {
-      opacity: 0.6;
-    }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        height: 100vh;
+        display: grid;
+        min-height: 750px;
+        place-items: center;
+        padding: 0 var(--gap-md);
+        background-color: var(--body-bg);
+      }
+      :disabled {
+        opacity: 0.6;
+      }
 
-    /*
-      Utilites
+      /*
+      Utilities
     */
 
-    .visually-hidden {
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      position: absolute;
-      white-space: nowrap;
-      clip: rect(0 0 0 0);
-      clip-path: inset(50%);
-    }
+      .visually-hidden {
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+      }
 
-    .title {
-      color: var(--title-cl);
-    }
-    .title.main {
-      font-size: 1.375rem;
-      margin-bottom: var(--gap-xs);
-      font-weight: 500;
-    }
-    .title.sub {
-      font-size: 1.1rem;
-      margin-bottom: var(--gap-md);
-      font-weight: 600;
-    }
+      .title {
+        color: var(--title-cl);
+      }
+      .title.main {
+        font-size: 1.375rem;
+        margin-bottom: var(--gap-xs);
+        font-weight: 500;
+      }
+      .title.sub {
+        font-size: 1.1rem;
+        margin-bottom: var(--gap-md);
+        font-weight: 600;
+      }
 
-    .btn {
-      color: #6C757D;
-      font-size: 14px;
-      min-height: 40px;
-      background: none;
-      border-radius: 3px;
-      border: 1px solid #aaa;
-      padding: 0 var(--gap-sm);
-      text-transform: uppercase;
-      transition: background-color 0.3s;
-      will-change: border-color, background-color;
-    }
-    .btn:is(:hover, :focus-visible) {
-      background-color: #f5f5f5;
-    }
-    .icon-btn {
-      align-items: center;
-      display: inline-flex;
-    }
+      .btn {
+        color: #6c757d;
+        font-size: 14px;
+        min-height: 40px;
+        background: none;
+        border-radius: 3px;
+        border: 1px solid #aaa;
+        padding: 0 var(--gap-sm);
+        text-transform: uppercase;
+        transition: background-color 0.3s;
+        will-change: border-color, background-color;
+      }
+      .btn:is(:hover, :focus-visible) {
+        background-color: #f5f5f5;
+      }
+      .icon-btn {
+        align-items: center;
+        display: inline-flex;
+      }
 
-    /*
+      /*
       Editor Styles
     */
 
-    .editor {
-      display: grid;
-      gap: var(--gap-md);
-      border-radius: 10px;
-      background-color: var(--editor-bg);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      padding: var(--gap-lg) var(--gap-xl) var(--gap-xl);
-    }
-    @media (min-width: 768px) {
       .editor {
+        display: grid;
+        gap: var(--gap-md);
+        border-radius: 10px;
+        background-color: var(--editor-bg);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        padding: var(--gap-lg) var(--gap-xl) var(--gap-xl);
+      }
+      @media (min-width: 768px) {
+        .editor {
+          gap: var(--gap-xl);
+          padding: 30px 35px 35px;
+          grid-template:
+            "title title"
+            "options preview"
+            "controls controls";
+        }
+        .editor > .title.main {
+          grid-area: title;
+        }
+      }
+
+      /* [1] Options */
+      .options {
+        display: grid;
         gap: var(--gap-xl);
-        padding: 30px 35px 35px;
-        grid-template: "title title"
-          "options preview"
-          "controls controls";
+        border-radius: 3px;
+        grid-area: options;
+        border: 1px solid #ccc;
+        padding: var(--gap-md) var(--gap-lg);
       }
-      .editor>.title.main {
-        grid-area: title;
-      }
-    }
 
-    /* [1] Options */
-    .options {
-      display: grid;
-      gap: var(--gap-xl);
-      border-radius: 3px;
-      grid-area: options;
-      border: 1px solid #ccc;
-      padding: var(--gap-md) var(--gap-lg);
-    }
+      /* Filters */
 
-    /* Filters */
-
-    .filters .tabs {
-      display: grid;
-      gap: var(--gap-sm);
-      align-items: center;
-      margin-bottom: var(--gap-lg);
-      grid-template-rows: repeat(2, 40px);
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .filters .tabs [aria-selected="true"]:not(:disabled) {
-      color: var(--primary-cl);
-      border-color: transparent;
-      background-color: var(--accent-cl);
-    }
-    .filters .slider .label,
-    .filters .slider input {
-      width: 100%;
-    }
-    .filters .slider .label {
-      display: flex;
-      font-size: 14px;
-      align-items: center;
-      color: var(--info-cl);
-      text-transform: capitalize;
-      justify-content: space-between;
-    }
-    .filters .slider input {
-      height: 5px;
-      accent-color: var(--primary-cl);
-    }
-
-    /* Transforms */
-
-    .transforms {
-      margin-top: var(--gap-xl);
-    }
-    .transforms .btn+.btn {
-      margin-left: var(--gap-sm);
-    }
-
-    /* [2] Preview */
-    @media (min-width: 768px) {
-      .preview {
-        grid-area: preview;
-      }
-    }
-    .preview * {
-      max-width: 100%;
-    }
-    @media (max-width: 767px) {
-      .preview * {
-        max-height: 200px;
-      }
-    }
-
-    /* [3] Controls */
-    .controls {
-      display: flex;
-      gap: var(--gap-xs);
-    }
-    @media (min-width: 768px) {
-      .controls {
+      .filters .tabs {
+        display: grid;
         gap: var(--gap-sm);
-        grid-area: controls;
+        align-items: center;
+        margin-bottom: var(--gap-lg);
+        grid-template-rows: repeat(2, 40px);
+        grid-template-columns: repeat(2, 1fr);
       }
-      #reset {
-        margin-right: auto;
+      .filters .tabs [aria-selected="true"]:not(:disabled) {
+        color: var(--primary-cl);
+        border-color: transparent;
+        background-color: var(--accent-cl);
       }
-    }
-    .controls .choose,
-    .controls .save {
-      color: var(--primary-cl);
-      border-color: transparent;
-    }
-    .controls .choose:hover,
-    .controls .save:hover {
-      opacity: 0.8;
-    }
-    .controls .choose {
-      background-color: #6C757D;
-    }
-    .controls .save {
-      background-color: var(--accent-cl);
-    }
-  </style>
-</head>
+      .filters .slider .label,
+      .filters .slider input {
+        width: 100%;
+      }
+      .filters .slider .label {
+        display: flex;
+        font-size: 14px;
+        align-items: center;
+        color: var(--info-cl);
+        text-transform: capitalize;
+        justify-content: space-between;
+      }
+      .filters .slider input {
+        height: 5px;
+        accent-color: var(--primary-cl);
+      }
 
-<body>
-  <main>
-    <article class="editor" aria-labelledby="title">
-      <h1 class="title main" id="title">Simple Image Editor</h1>
+      /* Transforms */
 
-      <!--
+      .transforms {
+        margin-top: var(--gap-xl);
+      }
+      .transforms .btn + .btn {
+        margin-left: var(--gap-sm);
+      }
+
+      /* [2] Preview */
+      @media (min-width: 768px) {
+        .preview {
+          grid-area: preview;
+        }
+      }
+      .preview * {
+        max-width: 100%;
+      }
+      @media (max-width: 767px) {
+        .preview * {
+          max-height: 200px;
+        }
+      }
+
+      /* [3] Controls */
+      .controls {
+        display: flex;
+        gap: var(--gap-xs);
+      }
+      @media (min-width: 768px) {
+        .controls {
+          gap: var(--gap-sm);
+          grid-area: controls;
+        }
+        #reset {
+          margin-right: auto;
+        }
+      }
+      .controls .choose,
+      .controls .save {
+        color: var(--primary-cl);
+        border-color: transparent;
+      }
+      .controls .choose:hover,
+      .controls .save:not(:disabled):hover {
+        opacity: 0.8;
+      }
+      .controls .choose {
+        background-color: #6c757d;
+      }
+      .controls .save {
+        background-color: var(--accent-cl);
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <article class="editor" aria-labelledby="title">
+        <h1 class="title main" id="title">Simple Image Editor</h1>
+
+        <!--
         [1] Options
       -->
 
-      <div role="region" aria-label="Editor Panel">
-        <fieldset disabled class="options">
-          <legend class="visually-hidden">Editor Options</legend>
+        <div role="region" aria-label="Editor Panel">
+          <fieldset disabled class="options">
+            <legend class="visually-hidden">Editor Options</legend>
 
-          <!-- Filters -->
-          <div class="filters" aria-labelledby="filters-label">
-            <h2 class="title sub" id="filters-label">Filters</h2>
+            <!-- Filters -->
+            <div class="filters" aria-labelledby="filters-label">
+              <h2 class="title sub" id="filters-label">Filters</h2>
 
-            <div role="tablist" class="tabs">
-              <button role="tab" aria-selected="true" aria-controls="slider" class="btn">brightness</button>
-              <button role="tab" aria-selected="false" aria-controls="slider" class="btn">saturation</button>
-              <button role="tab" aria-selected="false" aria-controls="slider" class="btn">inversion</button>
-              <button role="tab" aria-selected="false" aria-controls="slider" class="btn">grayscale</button>
-            </div>
-
-            <div class="slider">
-              <div aria-hidden="true" class="label">
-                <span class="name">brightness</span>
-                <span class="val">100%</span>
+              <div role="tablist" class="tabs">
+                <button
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="slider"
+                  class="btn"
+                >
+                  brightness
+                </button>
+                <button
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="slider"
+                  class="btn"
+                >
+                  saturation
+                </button>
+                <button
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="slider"
+                  class="btn"
+                >
+                  inversion
+                </button>
+                <button
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="slider"
+                  class="btn"
+                >
+                  grayscale
+                </button>
               </div>
 
-              <input type="range" value="100" max="200" aria-label="brightness" id="slider" />
+              <div class="slider">
+                <div aria-hidden="true" class="label">
+                  <span class="name">brightness</span>
+                  <span class="val">100%</span>
+                </div>
+
+                <input
+                  type="range"
+                  value="100"
+                  max="200"
+                  aria-label="brightness"
+                  id="slider"
+                />
+              </div>
             </div>
-          </div>
 
-          <!-- Transforms -->
-          <div class="transforms" aria-labelledby="transforms-label">
-            <h2 class="title sub" id="transforms-label">Rotate & Flip</h2>
+            <!-- Transforms -->
+            <div class="transforms" aria-labelledby="transforms-label">
+              <h2 class="title sub" id="transforms-label">Rotate & Flip</h2>
 
-            <button aria-label="Rotate Right" title="Rotate Right" class="btn icon-btn" id="rotate-right">
-              <svg focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24">
-                <path d="M463.5 224H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5z" />
-              </svg>
-            </button>
-            <button aria-label="Rotate Left" title="Rotate Left" class="btn icon-btn" id="rotate-left">
-              <svg focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24">
-                <path d="M48.5 224H40c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2L98.6 96.6c87.6-86.5 228.7-86.2 315.8 1c87.5 87.5 87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3c-62.2-62.2-162.7-62.5-225.3-1L185 183c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8H48.5z" />
-              </svg>
-            </button>
-            <button aria-label="Horizontal Flip" title="Horizontal Flip" class="btn icon-btn" id="flip-horz">
-              <svg focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                <path d="m3 18 6-6-6-6v12zM15 12l6 6V6l-6 6zM11 3h2v3h-2zM11 8h2v3h-2zM11 13h2v3h-2zM11 18h2v3h-2z" />
-              </svg>
-            </button>
-            <button aria-label="Vertical Flip" title="Vertical Flip" class="btn icon-btn" id="flip-vert">
-              <svg focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                <path d="M6 21h12l-6-6-6 6zM18 3H6l6 6 6-6zM3 11h3v2H3zM8 11h3v2H8zM13 11h3v2h-3zM18 11h3v2h-3z" />
-              </svg>
-            </button>
-          </div>
-        </fieldset>
-      </div>
+              <button
+                aria-label="Rotate Right"
+                title="Rotate Right"
+                class="btn icon-btn"
+                id="rotate-right"
+              >
+                <svg
+                  focusable="false"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                  width="24"
+                  height="24"
+                >
+                  <path
+                    d="M463.5 224H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5z"
+                  />
+                </svg>
+              </button>
+              <button
+                aria-label="Rotate Left"
+                title="Rotate Left"
+                class="btn icon-btn"
+                id="rotate-left"
+              >
+                <svg
+                  focusable="false"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                  width="24"
+                  height="24"
+                >
+                  <path
+                    d="M48.5 224H40c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2L98.6 96.6c87.6-86.5 228.7-86.2 315.8 1c87.5 87.5 87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3c-62.2-62.2-162.7-62.5-225.3-1L185 183c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8H48.5z"
+                  />
+                </svg>
+              </button>
+              <button
+                aria-label="Horizontal Flip"
+                title="Horizontal Flip"
+                class="btn icon-btn"
+                id="flip-horz"
+              >
+                <svg
+                  focusable="false"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                >
+                  <path
+                    d="m3 18 6-6-6-6v12zM15 12l6 6V6l-6 6zM11 3h2v3h-2zM11 8h2v3h-2zM11 13h2v3h-2zM11 18h2v3h-2z"
+                  />
+                </svg>
+              </button>
+              <button
+                aria-label="Vertical Flip"
+                title="Vertical Flip"
+                class="btn icon-btn"
+                id="flip-vert"
+              >
+                <svg
+                  focusable="false"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                >
+                  <path
+                    d="M6 21h12l-6-6-6 6zM18 3H6l6 6 6-6zM3 11h3v2H3zM8 11h3v2H8zM13 11h3v2h-3zM18 11h3v2h-3z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </fieldset>
+        </div>
 
-      <!--
+        <!--
         [2] Preview
       -->
 
-      <div role="region" aria-label="Image Preview" class="preview">
-        <svg focusable="false" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="437" height="316" viewBox="0 0 437 316">
-          <defs>
-            <linearGradient id="linear-gradient" x1="1.047" y1="0.043" x2="1.032" y2="0.924" gradientUnits="objectBoundingBox">
-              <stop offset="0" stop-color="#c2c2c2" />
-              <stop offset="1" stop-color="#9f9f9f" />
-            </linearGradient>
-          </defs>
-          <g id="Group_395" data-name="Group 395" transform="translate(-561 -195)">
-            <path id="Path_134" data-name="Path 134" d="M5,0H432a5,5,0,0,1,5,5V311a5,5,0,0,1-5,5H5a5,5,0,0,1-5-5V5A5,5,0,0,1,5,0Z" transform="translate(561 195)" fill="#f2f2f2" />
-            <g id="layer1" transform="translate(292.867 165.465)" opacity="0.55">
-              <path id="rect1017" d="M7.014,0H168.471a7.014,7.014,0,0,1,7.014,7.014v65a7.014,7.014,0,0,1-7.014,7.014H7.014A7.014,7.014,0,0,1,0,72.01v-65A7.014,7.014,0,0,1,7.014,0Z" transform="translate(399.134 122.791)" fill="#f2f2f2" />
-              <g id="g1015" transform="translate(440.421 122.536)">
-                <rect id="rect1002" width="43.895" height="48.142" rx="8.397" transform="translate(0 33.337) rotate(-16.343)" fill="#9f9f9f" />
-                <g id="g1000" transform="translate(32.701 0) rotate(16.321)">
-                  <rect id="rect961" width="57.382" height="61.709" rx="4.596" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="5.398" fill="url(#linear-gradient)" />
-                  <g id="g875" transform="translate(6.344 5.617)">
-                    <rect id="rect3338" width="45.119" height="41.342" transform="translate(0)" fill="#ccc" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.257" />
-                    <rect id="rect3342" width="45.119" height="19.293" transform="translate(0)" fill="#fff" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.257" />
-                    <path id="path3344" d="M0,13.781,3.534,8.862,9.095,4.713,10.554,6.42,11.8,2.866l.753-.274L13.781,0,30.318,16.537" transform="translate(2.756 5.512)" fill="#ccc" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.257" fill-rule="evenodd" />
-                    <path id="path3390-0" d="M4.686,0q.564,2.27,1,4.571.328,1.745.58,3.5L4.236,7.416,0,4.713.489,8.978.341,11.256l.924,2.791,6.724-1.08,7.723-1.942L11.319,3.911l-.891,1.372L7.936,3.25Z" transform="translate(11.851 5.512)" fill="#b3b3b3" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.257" fill-rule="evenodd" />
-                    <path id="path3358" d="M0,13.781,7.524,6.943l1.7-.889L11.4,1.994,13.781,0,30.318,16.537" transform="translate(13.781 8.269)" fill="#ccc" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.257" fill-rule="evenodd" />
-                    <path id="path3386" d="M0,0,3.3,7.434v5.533l2.063,1.788a7.493,7.493,0,0,1,2.062-1.443,25.381,25.381,0,0,1,4.334-1.251,4.781,4.781,0,0,0,1.673-.723,2.741,2.741,0,0,0,.347-.312H11.025L7.3,7.3,4.559,2.8l-.942.812Z" transform="translate(27.562 8.269)" fill="#b3b3b3" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.257" fill-rule="evenodd" />
-                    <path id="path3370" d="M13.781,22.049c-.038-.882-.81-1.618,1.573-2.818,2.924-1.472,11.566-3.3,13.979-5.511,1.785-1.638-6.469-3.461-5.055-5.427C24.92,7.4,29.7,6.459,31.825,5.512c2.013-.9,1.391-1.819,2.885-2.754C36.154,1.856,40.99.942,41.343,0c-.957.967-6.324,1.875-8.269,2.756-2.052.93-1.972,1.831-4.541,2.709-2.768.946-8.19,1.888-9.436,2.8-2.61,1.917,4.305,3.914,1.489,5.512-3.815,2.165-13.72,3.978-17.829,5.512C-.083,20.354.146,20.924,0,22.049" transform="translate(0 19.293)" fill="#fff" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.257" fill-rule="evenodd" />
+        <div role="region" aria-label="Image Preview" class="preview">
+          <svg
+            focusable="false"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            width="437"
+            height="316"
+            viewBox="0 0 437 316"
+          >
+            <defs>
+              <linearGradient
+                id="linear-gradient"
+                x1="1.047"
+                y1="0.043"
+                x2="1.032"
+                y2="0.924"
+                gradientUnits="objectBoundingBox"
+              >
+                <stop offset="0" stop-color="#c2c2c2" />
+                <stop offset="1" stop-color="#9f9f9f" />
+              </linearGradient>
+            </defs>
+            <g
+              id="Group_395"
+              data-name="Group 395"
+              transform="translate(-561 -195)"
+            >
+              <path
+                id="Path_134"
+                data-name="Path 134"
+                d="M5,0H432a5,5,0,0,1,5,5V311a5,5,0,0,1-5,5H5a5,5,0,0,1-5-5V5A5,5,0,0,1,5,0Z"
+                transform="translate(561 195)"
+                fill="#f2f2f2"
+              />
+              <g
+                id="layer1"
+                transform="translate(292.867 165.465)"
+                opacity="0.55"
+              >
+                <path
+                  id="rect1017"
+                  d="M7.014,0H168.471a7.014,7.014,0,0,1,7.014,7.014v65a7.014,7.014,0,0,1-7.014,7.014H7.014A7.014,7.014,0,0,1,0,72.01v-65A7.014,7.014,0,0,1,7.014,0Z"
+                  transform="translate(399.134 122.791)"
+                  fill="#f2f2f2"
+                />
+                <g id="g1015" transform="translate(440.421 122.536)">
+                  <rect
+                    id="rect1002"
+                    width="43.895"
+                    height="48.142"
+                    rx="8.397"
+                    transform="translate(0 33.337) rotate(-16.343)"
+                    fill="#9f9f9f"
+                  />
+                  <g id="g1000" transform="translate(32.701 0) rotate(16.321)">
+                    <rect
+                      id="rect961"
+                      width="57.382"
+                      height="61.709"
+                      rx="4.596"
+                      stroke="#fff"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="5.398"
+                      fill="url(#linear-gradient)"
+                    />
+                    <g id="g875" transform="translate(6.344 5.617)">
+                      <rect
+                        id="rect3338"
+                        width="45.119"
+                        height="41.342"
+                        transform="translate(0)"
+                        fill="#ccc"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.257"
+                      />
+                      <rect
+                        id="rect3342"
+                        width="45.119"
+                        height="19.293"
+                        transform="translate(0)"
+                        fill="#fff"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.257"
+                      />
+                      <path
+                        id="path3344"
+                        d="M0,13.781,3.534,8.862,9.095,4.713,10.554,6.42,11.8,2.866l.753-.274L13.781,0,30.318,16.537"
+                        transform="translate(2.756 5.512)"
+                        fill="#ccc"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.257"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        id="path3390-0"
+                        d="M4.686,0q.564,2.27,1,4.571.328,1.745.58,3.5L4.236,7.416,0,4.713.489,8.978.341,11.256l.924,2.791,6.724-1.08,7.723-1.942L11.319,3.911l-.891,1.372L7.936,3.25Z"
+                        transform="translate(11.851 5.512)"
+                        fill="#b3b3b3"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.257"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        id="path3358"
+                        d="M0,13.781,7.524,6.943l1.7-.889L11.4,1.994,13.781,0,30.318,16.537"
+                        transform="translate(13.781 8.269)"
+                        fill="#ccc"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.257"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        id="path3386"
+                        d="M0,0,3.3,7.434v5.533l2.063,1.788a7.493,7.493,0,0,1,2.062-1.443,25.381,25.381,0,0,1,4.334-1.251,4.781,4.781,0,0,0,1.673-.723,2.741,2.741,0,0,0,.347-.312H11.025L7.3,7.3,4.559,2.8l-.942.812Z"
+                        transform="translate(27.562 8.269)"
+                        fill="#b3b3b3"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.257"
+                        fill-rule="evenodd"
+                      />
+                      <path
+                        id="path3370"
+                        d="M13.781,22.049c-.038-.882-.81-1.618,1.573-2.818,2.924-1.472,11.566-3.3,13.979-5.511,1.785-1.638-6.469-3.461-5.055-5.427C24.92,7.4,29.7,6.459,31.825,5.512c2.013-.9,1.391-1.819,2.885-2.754C36.154,1.856,40.99.942,41.343,0c-.957.967-6.324,1.875-8.269,2.756-2.052.93-1.972,1.831-4.541,2.709-2.768.946-8.19,1.888-9.436,2.8-2.61,1.917,4.305,3.914,1.489,5.512-3.815,2.165-13.72,3.978-17.829,5.512C-.083,20.354.146,20.924,0,22.049"
+                        transform="translate(0 19.293)"
+                        fill="#fff"
+                        stroke="#fff"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.257"
+                        fill-rule="evenodd"
+                      />
+                    </g>
                   </g>
                 </g>
               </g>
+              <text
+                id="text1021"
+                transform="translate(780 411.768)"
+                fill="#bfbfbf"
+                font-size="16"
+                font-family="Poppins-Regular, Poppins"
+              >
+                <tspan x="-85.488" y="0">Choose Image to Edit</tspan>
+              </text>
             </g>
-            <text id="text1021" transform="translate(780 411.768)" fill="#bfbfbf" font-size="16" font-family="Poppins-Regular, Poppins">
-              <tspan x="-85.488" y="0">Choose Image to Edit</tspan>
-            </text>
-          </g>
-        </svg>
-      </div>
+          </svg>
+        </div>
 
-      <!--
+        <!--
         [3] Controls
       -->
 
-      <div role="region" aria-label="Editor Controls" class="controls">
-        <button disabled class="btn" id="reset">Reset Filters</button>
-        <input type="file" accept="image/*" id="upload" hidden />
-        <button class="btn choose" id="choose">Choose Image</button>
-        <button disabled class="btn save" id="save">Save Image</button>
-      </div>
-    </article>
-  </main>
+        <div role="region" aria-label="Editor Controls" class="controls">
+          <button disabled class="btn" id="reset">Reset Filters</button>
+          <input type="file" accept="image/*" id="upload" hidden />
+          <button class="btn choose" id="choose">Choose Image</button>
+          <button disabled class="btn save" id="save">Save Image</button>
+        </div>
+      </article>
+    </main>
 
-  <script>
-    (function() {
-      const $ = document.querySelector.bind(document);
-      const $$ = document.querySelectorAll.bind(document);
+    <script>
+      (function () {
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
 
-      const FiltersModal = {
-        brightness: { val: 100, max: 200 },
-        saturation: { val: 100, max: 200 },
-        inversion: { val: 0, max: 100 },
-        grayscale: { val: 0, max: 100 },
-      };
-      const TransformsModal = {
-        rotate: 0,
-        flipVert: 1,
-        flipHorz: 1,
-      };
+        const FiltersModal = {
+          brightness: { val: 100, max: 200 },
+          saturation: { val: 100, max: 200 },
+          inversion: { val: 0, max: 100 },
+          grayscale: { val: 0, max: 100 },
+        };
+        const TransformsModal = {
+          rotate: 0,
+          flipVert: 1,
+          flipHorz: 1,
+        };
 
-      const Controller = {
-        // Filters
+        const Controller = {
+          // Filters
 
-        getFilter: (name) => FiltersModal[name],
-        resetFilters: () => {
-          FiltersModal.brightness.val = 100;
-          FiltersModal.saturation.val = 100;
-          FiltersModal.inversion.val = 0;
-          FiltersModal.grayscale.val = 0;
-        },
-
-        setFilterVal: (name, val) => FiltersModal[name].val = val,
-        getFiltersVals: () => Object.values(FiltersModal).map(f => f.val),
-
-        // Transforms
-
-        getRotate: () => TransformsModal.rotate,
-        setRotate: (val) => TransformsModal.rotate = val,
-
-        getFlipVert: () => TransformsModal.flipVert,
-        setFlipVert: (val) => TransformsModal.flipVert = val,
-
-        getFlipHorz: () => TransformsModal.flipHorz,
-        setFlipHorz: (val) => TransformsModal.flipHorz = val,
-
-        resetTransforms: () => {
-          TransformsModal.rotate = 0;
-          TransformsModal.flipHorz = 1;
-          TransformsModal.flipVert = 1;
-        },
-
-        // Init
-
-        init: function() {
-          FiltersViews.init();
-          TransformsViews.init();
-          ControlsViews.init();
-        },
-      };
-
-      const FiltersViews = {
-        init: function() {
-          const { chooseFilter, updateFilter } = this.render;
-          const choose = chooseFilter.bind(FiltersViews.render);
-          const update = updateFilter.bind(FiltersViews.render);
-
-          $("#slider").onchange = update;
-          $$(".filters .btn").forEach(btn => btn.onclick = choose);
-        },
-
-        render: {
-          chooseFilter: function(e) {
-            const name = e.target.textContent;
-            const { val, max } = Controller.getFilter(name);
-
-            // [1] Handle Slider Label
-            this.updateSliderLabel.all(name, val);
-
-            // [2] Handle Slider
-            this.updateSlider.all(max, val, name);
-
-            // [3] Handle Active Tab
-            e.target.parentElement.querySelector("[aria-selected=true]").ariaSelected = String(false);
-            e.target.ariaSelected = String(true);
+          getFilter: (name) => FiltersModal[name],
+          resetFilters: () => {
+            FiltersModal.brightness.val = 100;
+            FiltersModal.saturation.val = 100;
+            FiltersModal.inversion.val = 0;
+            FiltersModal.grayscale.val = 0;
           },
-          updateFilter: function({ target: { ariaLabel: name, value: val } }) {
-            Controller.setFilterVal(name, val);
-            this.updateSliderLabel.val(val);
-            this.applyFilters();
-          },
-          applyFilters: () => {
-            const [brightness, saturation, inversion, grayscale] = Controller.getFiltersVals();
-            $("#preview").style.filter = `brightness(${brightness}%) saturate(${saturation}%) invert(${inversion}%) grayscale(${grayscale}%)`;
-          },
-          resetFilters: function() {
-            Controller.resetFilters();
-            this.applyFilters();
 
-            const name = $(".tabs [aria-selected=true]").textContent;
-            const { val } = Controller.getFilter(name);
+          setFilterVal: (name, val) => (FiltersModal[name].val = val),
+          getFiltersVals: () => Object.values(FiltersModal).map((f) => f.val),
 
-            this.updateSlider.val(val);
-            this.updateSliderLabel.val(val);
+          // Transforms
+
+          getRotate: () => TransformsModal.rotate,
+          setRotate: (val) => (TransformsModal.rotate = val),
+
+          getFlipVert: () => TransformsModal.flipVert,
+          setFlipVert: (val) => (TransformsModal.flipVert = val),
+
+          getFlipHorz: () => TransformsModal.flipHorz,
+          setFlipHorz: (val) => (TransformsModal.flipHorz = val),
+
+          resetTransforms: () => {
+            TransformsModal.rotate = 0;
+            TransformsModal.flipHorz = 1;
+            TransformsModal.flipVert = 1;
           },
-          updateSlider: {
-            max: (max) => $("#slider").max = max,
-            val: (val) => $("#slider").value = val,
-            aria: (aria) => $("#slider").ariaLabel = aria,
-            all: function(max, val, aria) {
-              this.max(max);
-              this.val(val);
-              this.aria(aria);
+
+          // Init
+
+          init: function () {
+            FiltersViews.init();
+            TransformsViews.init();
+            ControlsViews.init();
+          },
+        };
+
+        const FiltersViews = {
+          init: function () {
+            const { chooseFilter, updateFilter } = this.render;
+            const choose = chooseFilter.bind(FiltersViews.render);
+            const update = updateFilter.bind(FiltersViews.render);
+
+            $("#slider").onchange = update;
+            $$(".filters .btn").forEach((btn) => (btn.onclick = choose));
+          },
+
+          render: {
+            chooseFilter: function (e) {
+              const name = e.target.textContent;
+              const { val, max } = Controller.getFilter(name);
+
+              // [1] Handle Slider Label
+              this.updateSliderLabel.all(name, val);
+
+              // [2] Handle Slider
+              this.updateSlider.all(max, val, name);
+
+              // [3] Handle Active Tab
+              e.target.parentElement.querySelector(
+                "[aria-selected=true]"
+              ).ariaSelected = String(false);
+              e.target.ariaSelected = String(true);
+            },
+            updateFilter: function ({
+              target: { ariaLabel: name, value: val },
+            }) {
+              Controller.setFilterVal(name, val);
+              this.updateSliderLabel.val(val);
+              this.applyFilters();
+            },
+            applyFilters: () => {
+              const [brightness, saturation, inversion, grayscale] =
+                Controller.getFiltersVals();
+              $(
+                "#preview"
+              ).style.filter = `brightness(${brightness}%) saturate(${saturation}%) invert(${inversion}%) grayscale(${grayscale}%)`;
+            },
+            resetFilters: function () {
+              Controller.resetFilters();
+              this.applyFilters();
+
+              const name = $(".tabs [aria-selected=true]").textContent;
+              const { val } = Controller.getFilter(name);
+
+              this.updateSlider.val(val);
+              this.updateSliderLabel.val(val);
+            },
+            updateSlider: {
+              max: (max) => ($("#slider").max = max),
+              val: (val) => ($("#slider").value = val),
+              aria: (aria) => ($("#slider").ariaLabel = aria),
+              all: function (max, val, aria) {
+                this.max(max);
+                this.val(val);
+                this.aria(aria);
+              },
+            },
+            updateSliderLabel: {
+              name: (name) => ($(".slider .name").innerHTML = name),
+              val: (val) => ($(".slider .val").innerHTML = val + "%"),
+              all: function (name, val) {
+                this.name(name);
+                this.val(val);
+              },
             },
           },
-          updateSliderLabel: {
-            name: (name) => $(".slider .name").innerHTML = name,
-            val: (val) => $(".slider .val").innerHTML = val + "%",
-            all: function(name, val) {
-              this.name(name);
-              this.val(val);
-            },
-          },
-        },
-      };
-      const TransformsViews = {
-        init: function() {
-          const { rotateRight, rotateLeft, flipVert, flipHorz, applyTransforms } = this.render;
+        };
+        const TransformsViews = {
+          init: function () {
+            const {
+              rotateRight,
+              rotateLeft,
+              flipVert,
+              flipHorz,
+              applyTransforms,
+            } = this.render;
 
-          $$(".transforms .icon-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-              switch (btn.id) {
-                case "rotate-right":
-                  rotateRight();
-                  break;
-                case "rotate-left":
-                  rotateLeft();
-                  break;
-                case "flip-vert":
-                  flipVert();
-                  break;
-                case "flip-horz":
-                  flipHorz();
-              }
-              applyTransforms();
+            $$(".transforms .icon-btn").forEach((btn) => {
+              btn.addEventListener("click", () => {
+                switch (btn.id) {
+                  case "rotate-right":
+                    rotateRight();
+                    break;
+                  case "rotate-left":
+                    rotateLeft();
+                    break;
+                  case "flip-vert":
+                    flipVert();
+                    break;
+                  case "flip-horz":
+                    flipHorz();
+                }
+                applyTransforms();
+              });
             });
-          });
-        },
+          },
 
-        render: {
-          rotateRight: () => {
-            Controller.setRotate(
-              Controller.getRotate() + 90
-            );
+          render: {
+            rotateRight: () => {
+              Controller.setRotate(Controller.getRotate() + 90);
+            },
+            rotateLeft: () => {
+              Controller.setRotate(Controller.getRotate() - 90);
+            },
+            flipVert: () => {
+              Controller.setFlipVert(Controller.getFlipVert() === -1 ? 1 : -1);
+            },
+            flipHorz: () => {
+              Controller.setFlipHorz(Controller.getFlipHorz() === -1 ? 1 : -1);
+            },
+            applyTransforms: () => {
+              const { getRotate, getFlipVert, getFlipHorz } = Controller;
+              $(
+                "#preview"
+              ).style.transform = `rotate(${getRotate()}deg) scale(${getFlipHorz()}, ${getFlipVert()})`;
+            },
+            resetTransforms: function () {
+              Controller.resetTransforms();
+              this.applyTransforms();
+            },
           },
-          rotateLeft: () => {
-            Controller.setRotate(
-              Controller.getRotate() - 90
-            );
-          },
-          flipVert: () => {
-            Controller.setFlipVert(
-              Controller.getFlipVert() === -1 ? 1 : -1
-            );
-          },
-          flipHorz: () => {
-            Controller.setFlipHorz(
-              Controller.getFlipHorz() === -1 ? 1 : -1
-            );
-          },
-          applyTransforms: () => {
-            const { getRotate, getFlipVert, getFlipHorz } = Controller;
-            $("#preview").style.transform = `rotate(${getRotate()}deg) scale(${getFlipHorz()}, ${getFlipVert()})`;
-          },
-          resetTransforms: function() {
-            Controller.resetTransforms();
-            this.applyTransforms();
-          },
-        },
-      };
-      const ControlsViews = {
-        init: function() {
-          const { reset, upload, save } = this.render;
+        };
+        const ControlsViews = {
+          init: function () {
+            const { reset, upload, save } = this.render;
 
-          $("#reset").onclick = reset;
-          $("#upload").onchange = upload;
-          $("#choose").onclick = () => $("#upload").click();
-          $("#save").onclick = save;
-        },
-
-        render: {
-          reset: () => {
-            FiltersViews.render.resetFilters();
-            TransformsViews.render.resetTransforms();
+            $("#reset").onclick = reset;
+            $("#upload").onchange = upload;
+            $("#choose").onclick = () => $("#upload").click();
+            $("#save").onclick = save;
           },
-          upload: () => {
-            const file = $("#upload").files[0];
-            if (!file) return;
 
-            $(".preview").innerHTML = `
+          render: {
+            reset: () => {
+              FiltersViews.render.resetFilters();
+              TransformsViews.render.resetTransforms();
+            },
+            upload: () => {
+              const file = $("#upload").files[0];
+              if (!file) return;
+
+              $(".preview").innerHTML = `
           <img
             src=${URL.createObjectURL(file)}
             alt="Editor Preview"
@@ -537,42 +759,49 @@
           />
         `;
 
-            $("#reset").click();
-            $$("[disabled]").length &&
-              $$("[disabled]").forEach(ele => ele.removeAttribute("disabled"));
+              $("#reset").click();
+              $$("[disabled]").length &&
+                $$("[disabled]").forEach((ele) =>
+                  ele.removeAttribute("disabled")
+                );
+            },
+            save: () => {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+              const previewImg = $("#preview");
+
+              // [1] Set Canvas Dimensions
+              canvas.width = previewImg.naturalWidth;
+              canvas.height = previewImg.naturalHeight;
+
+              // [2] Set Context Styles
+              ctx.filter = previewImg.style.filter;
+              ctx.translate(canvas.width / 2, canvas.height / 2);
+
+              const { getRotate, getFlipHorz, getFlipVert } = Controller;
+              getRotate() && ctx.rotate((getRotate() * Math.PI) / 180);
+              ctx.scale(getFlipHorz(), getFlipVert());
+
+              // [3] Draw Context
+              ctx.drawImage(
+                previewImg,
+                -canvas.width / 2,
+                -canvas.height / 2,
+                canvas.width,
+                canvas.height
+              );
+
+              // [4] Handle Download
+              const link = document.createElement("a");
+              link.download = "image.jpg";
+              link.href = canvas.toDataURL();
+              link.click();
+            },
           },
-          save: () => {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const previewImg = $("#preview");
+        };
 
-            // [1] Set Canvas Dimensions
-            canvas.width = previewImg.naturalWidth;
-            canvas.height = previewImg.naturalHeight;
-
-            // [2] Set Context Styles
-            ctx.filter = previewImg.style.filter;
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-
-            const { getRotate, getFlipHorz, getFlipVert } = Controller;
-            getRotate() && ctx.rotate(getRotate() * Math.PI / 180);
-            ctx.scale(getFlipHorz(), getFlipVert());
-
-            // [3] Draw Context
-            ctx.drawImage(previewImg, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
-
-            // [4] Handle Download
-            const link = document.createElement("a");
-            link.download = "image.jpg";
-            link.href = canvas.toDataURL();
-            link.click();
-          },
-        },
-      };
-
-      Controller.init();
-    })();
-  </script>
-</body>
-
+        Controller.init();
+      })();
+    </script>
+  </body>
 </html>
