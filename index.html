@@ -237,6 +237,12 @@
         background-color: var(--accent-cl);
       }
     </style>
+    <script>
+      // Register the service worker
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js");
+      }
+    </script>
   </head>
 
   <body>
